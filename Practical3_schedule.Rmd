@@ -1,12 +1,24 @@
 ---
 title: 'Practical 3: Multiple explanatory variables'
-author: "NES2303"
-output:
-  html_document:
+author: "Roy Sanderson, Will Reid"
+format:
+  html:
     df_print: paged
-    number_sections: true
-  word_document:
-    number_sections: true
+    number-sections: true
+    toc: true
+    toc-depth: 1
+    embed-resources: true
+    html-math-method: mathml
+    css: custom.scss
+  docx:
+    toc: true
+    toc-depth: 1
+    number-sections: true
+    reference_docx: template.docx
+format-links: false
+editor_options:
+  markdown:
+    wrap: sentence
 ---
 
 <style type="text/css">
