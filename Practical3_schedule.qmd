@@ -61,7 +61,7 @@ Now that we have developed a good understanding of linear models we are going to
 
 # Multiple explanatory variables with interaction terms
 ## What are interaction terms?
-Interaction terms can be useful in both designed experiments and field surveys. They provide a way of checking whether the effects of two explanatory variables on the response are independent of each other, or alternatively whether the value of one explanatory variable alters what the other one does.
+Interaction terms can be useful in both designed experiments and field surveys. They provide a way of checking whether the effects of two explanatory variables on the response are independent of each other, or alternatively whether the value of one explanatory variable alters what the other one does. Unless you want to fit curves (see @sec-curves) or have certain specific experimental designs (see @sec-blocks) it is often worth checking if your multiple explanatory variables are independent or not by using interaction terms.
 
 ## Basic concepts in the 'goal-oriented' approach
 Our original linear model, with two explanatory variables is:
@@ -102,11 +102,11 @@ where:
  
 The $\textit{Explanatory 1}$ and $\textit{Explanatory 2}$ variables can be continuous and/or categorical. You can express an interaction term in R using the `lm()` function, by adding an extra term with the two explanatories separated by a colon `:` symbol.
 
-Let's look at the example from the [Interactive Website on interaction terms](https://naturalandenvironmentalscience.shinyapps.io/multiple_explan/#section-interactions-between-explanatory-variables)
+Let's look at the example from the [Interactive Website on interaction terms (right-click and open in new tab)](https://naturalandenvironmentalscience.shinyapps.io/multiple_explan/#section-interactive-demonstration)
 
 ## Example of interactions: blood plasma calcium in rabbits
 ### Before you begin
-1. Start RStudio in the usual way. Open your `NES2504` project from the main menu by clicking on **File -> Open project...** and navigate to your NES2504 project file and open it. Check that the word "None" has been replaced by "NES2504" in the project listing at the top right.
+1. Start RStudio in the usual way. Open your `NES2504` project from the main menu by clicking on **File -> Open project...** and navigate to your NES2504 project file and open it. **ESSENTIAL:** Check that the word "None" has been replaced by "NES2504" in the project listing at the top right of RStudio.
 2. From the main menu click "File -> New file -> R Script"
 3. Save your script, e.g. call it `practical3.R`
 4. Write a comment line, beginning with a `#` symbol, followed by a blank line e.g.
@@ -119,16 +119,17 @@ Let's look at the example from the [Interactive Website on interaction terms](ht
 Let's look at the example of the blood Ca level in rabbits, half from a lowland agricultural farm, half from an upland farm, split according to gender. So we have two categorical explanatory variables in this example.
 
 1. Download the file `plasma.csv` from Canvas
-2. Using the File Explorer (main Windows menu) copy the `plasma.csv` file from `Downloads` and paste into your `NES2504` project folder.
+2. Using the File Explorer (main Windows menu) copy the `plasma.csv` file from `Downloads` and paste into your `NES2504` project `Data` folder.
 3. Edit your `practical3.R` script to import the file into an R table called `plasma_dat` using the `read.csv` function.
 
 Now see if you can produce a boxplot similar to the following. **Hints**:
 
+* Look at your `plasma_dat` data.frame by double-clicking on its name in the RStudio Environment pane (top-right of RStudio). It has columns `calcium`, `sex`, `site`
 * `gf_boxplot()` is main function. You'll need to add `colour = ~sex` to colour the boxes by sex
 * `gf_labs()` to change default labels on x and y axes
 * `gf_theme()` to change overall format of plot with the `theme_classic()` option.
 
-Remember to save the code for your boxplot in `practical3.R` for reference!!
+Remember to enter the code for your boxplot into the bottom of `practical3.R` before running it.
 
 ```{r, echo=FALSE}
 plasma_dat <- read.csv("Data/plasma.csv")
@@ -142,19 +143,24 @@ gf_boxplot(calcium ~ site, colour = ~sex, data=plasma_dat) %>%
  * males seem to have lower blood Ca than females overall
  * in males the blood Ca increases from lowland to upland, whereas for females it decreases
  * the differences between males and females appear to be bigger at lowland than upland farms
- * if you were to draw a line to connect the two red boxes (females) and another line between the two blue boxes (males) the slopes of the two lines would be not be parallel.
+ * if you were to draw a line to connect the two red boxes (females) and another line between the two blue boxes (males) the **slopes of the two lines would be not be parallel**. If when you eyeball your plot it appears that the slopes of the lines are not parallel, this suggests that there is an interaction.
  
  
 ### Create a linear model with an interaction
-Using the information above, and your existing knowledge of `lm()`, try to create a linear model with soth the `site` and `sex` main effects, and also an interaction term. The resultant ANOVA table should match the one below. **Remember to include code, blank lines and comment lines in your `practical3.R` script**.
+Using the information above, and your existing knowledge of `lm()`, we can create a linear model with both the `site` and `sex` main effects, and also an interaction term. The resultant ANOVA table should match the one below. **Remember to include code, blank lines and comment lines in your `practical3.R` script**.
+
+```{r, eval=FALSE, echo=TRUE}
+# Create a linear model to see if blood calcium is affected by site, sex or
+# the interaction of site and sex in rabbits
+calcium_lm <- lm(calcium ~ site + sex + site:sex, data=plasma_dat)
+# Check the F-ratios and p-values for significance
+anova(calcium_lm)
+```
+
  
 ```{r, eval=TRUE, echo=FALSE}
 calcium_lm <- lm(calcium ~ site + sex + site:sex, data=plasma_dat)
 print(anova(calcium_lm))
-```
-```{r, eval=FALSE, echo=TRUE}
-calcium_lm <- lm(calcium ~ site + sex + site:sex, data=plasma_dat)
-anova(calcium_lm)
 ```
 
 Notice how your ANOVA table now has **three** rows for the explanatories, namely `site` on the first row, `sex` on the second row, and the interaction term `site:sex` on the third row. When `site` and `sex` are on their own, as on the first and second row, they are referred to as **"main effects"** to distinguish them from when they both occur together in the third row as the **interaction term**. As usual there is of course a final row for the `Residuals` or unexplained noise ($\epsilon$) in your data. You can see three F-ratios (one for each explanatory variable) and associated p-values, the latter under the column headed `Pr(>F)`.
@@ -164,7 +170,7 @@ Before reading on, think about these questions:
 * How would you report the above F and p-values in a report?
 * Which explanatory variables are "statistically significant"?
 
-Please speak to a demonstrator if unsure, particularly as the way in which R presents p-values is not in an acceptable format for your reports.
+Please speak to a demonstrator if unsure, particularly as the default way in which R presents p-values is **not** an acceptable format for your reports.
 
 ## How to interpret a linear model with interaction terms
 When you have an interaction term as one of your explanatory variables, always look at it **first**. If it is not significant, you might be able to manage with a simpler linear model that does not include interaction terms. It is always best to try and have a simpler rather than overly complex linear model when possible.
@@ -196,13 +202,18 @@ gf_boxplot(calcium ~ sex, data=plasma_dat)
 
 Now the sets of values are very different, with the males much lower overall than the females, which explains the large F-ratio and highly significant (p<0.001) results for `sex` main effect.
 
-Finally, the interaction term. As this graph is a little trickier to draw, I have included the R code. We include both the raw data, and lines connecting the means, to show the direction of change. The R code below has several lines of comments to help you understand the code, but please ask if you have questions:
+Finally, the interaction term. As this graph is a little trickier to draw, I have included the R code. We include both the raw data, and lines connecting the means, to show the direction of change. The R code below has several lines of comments to help you understand the code, but please ask if you have questions. It also includes the `####` to auto-create a table of contents in your code. It can be useful to add explanations to your R code, so when you return to it in a few months time you understand what it is doing:
 
 ```{r warning=FALSE, message=FALSE}
+# Create a full interaction plot of rabbit blood calcium data ####
+
+# Explanation of plotting code
 # gf_point() adds the raw data points
-# gf_line() adds lines. We use stat="summary" to indicate the mean
-# gf_line() also has a group term to separate instruct R to calculate the
-# summary statistic (the mean) for each group (sex) separately
+# gf_line() adds lines
+# gf_line() with stat="summary"  indicates the lines should connect mean values
+# gf_line() with group= ~sex     indicates separate lines for males and females
+# gf_line() with colour=~sex     indicates males and females coloured different
+#
 gf_point(calcium ~ site, colour= ~sex, data=plasma_dat) %>%
   gf_line(calcium ~ site, colour= ~sex, group= ~sex, stat="summary", data=plasma_dat)
 ```
@@ -225,17 +236,23 @@ anr <- read.csv("Data/anr_ancova.csv")
 Begin by plotting your fish data, with the area on the x-axis and biochemical composition on the y-axis. As you have two areas, you want to colour your points in accornding to the SE or NW locations, as well as add fitted lines:
 
 ```{r plot-anr, warning=FALSE, echo=TRUE}
-# plot data first
+# Plot fish data with different lines for each site in the area column ####
 gf_point(d13c ~ standard_length, col = ~area, data = anr) %>%
   gf_lm(d13c ~ standard_length, col = ~area, data = anr) %>%
   gf_labs(x = "Standard length (mm)", y = "d13c per mil") %>% 
   gf_theme(theme_classic())
 ```
 
+It is obvious that d13c increases with larger fish, and that concentrations appear to be higher in the SE than NW site. Are the lines parallel? The lines for the NW and SE sites look roughly parallel. But are they really? We need to do a formal statistical test using `lm()` to check.
+
 ## Analysis of covariance (ANCOVA)
-When you have one continuous explanatory and one categorical explanatory, most statistics textbooks describe it as "ANCOVA". Fortunately, the method of analysis is identical to before, using the `lm` command. It is obvious that d13c increases with larger fish, and that concentrations appear to be higher in the SE than NW site. Are the lines parallel? Let's check with a linear model. One problem with having one continuous and one categorical explanatory variable is that the actual results from your `anova` function depend on the order in which you list the explanatory variables into the model. This can be resolved using the `Anova` function from the `car` library, which we will load first. 
+When you have one continuous explanatory and one categorical explanatory, most statistics textbooks describe it as "ANCOVA". Fortunately, the method of analysis is identical to before, using the `lm` command. **BUT** a problem with having one continuous and one categorical explanatory variable is that the actual results from your `anova` function depend on the order in which you list the explanatory variables into the model. This can be resolved using the `Anova` function from the `car` library, which we will load first. 
 
 ```{r, warning=FALSE, message=FALSE}
+# ANCOVA of fish data ####
+# Load the car library. We need to use Anova() function as one explanatory
+# variable, area, is categorical, whereas the other, standard_length, is
+# continuous
 library(car)
 anr_lm <- lm(d13c ~ standard_length + area + standard_length:area, data = anr)
 Anova(anr_lm) # Note capital A on Anova
@@ -255,7 +272,7 @@ analysis you have one continuous and one categorical explanatory variables. The
 standard for of sums-of-squares (SS) used by R (Type I) are sensitive to the 
 order in which you enter the explanatory variables into the model. The problem
 also arises with unbalanced data if a replicate is accidentally damaged. See
-the interactive website [multiple explanatories](https://naturalandenvironmentalscience.shinyapps.io/multiple_explan/#section-aggh-lost-data) for more examples.
+the interactive website [multiple explanatories (right-click and open in a new tab)](https://naturalandenvironmentalscience.shinyapps.io/multiple_explan/#section-aggh-lost-data) for more examples.
 
 # Using linear models to fit curves
 How can a linear model fit a curve? The term "linear model" simply refers to the way in which the different explanatory variables are combined. They are all combined using simple addition symbols `+`, for example, your model:
@@ -270,9 +287,9 @@ It is much easier to fit a straight line than a curve, but often an initial expl
 1. A simple mathematical transformation of your data to bring it back to a straight line. Commonly used transformations are logarithmic `log()` and square-root `sqrt()` of your response variable.
 2. Use a polynomial linear model, by adding extra explanatory variables calculated from the first explanatory variable. The explanatories thus become $x$, $x^2$, $x^3$ etc.
 
-The use of both methods is somewhat controversial. Mathematical transformations can make it harder to understand and interpret the results, especially if there is not an obvious biological basis for the transformation. High-order polynomial terms such as $x^3$ and $x^4$ will create attractive smooth curves, but have little biological meaning. Conversely, some mathematical transformations are so common you probably never even think about them: **pH** is actually the log-transformation of hydrogen ions; these have a skewed 'log-normal' distribution by default, so taking a logarithm to create the pH scale makes sense. You can also end up with skewed data when you have counts of a response variable, since you cannot have negative counts. It used to be common to log-transform count data using `log(y+1)` (in case there are any zeros). Here we will focus on a polynomial example to fit a curve.
+The use of both methods is somewhat controversial. Mathematical transformations can make it harder to understand and interpret the results, especially if there is not an obvious biological basis for the transformation. High-order polynomial terms such as $x^3$ and $x^4$ will create attractive smooth curves, but have little biological meaning. Conversely, some mathematical transformations are so common you probably never even think about them: **pH** is actually the log-transformation of hydrogen ions; these have a skewed 'log-normal' distribution by default, so taking a logarithm to create the pH scale makes sense. You can also end up with skewed data when you have counts of a response variable, since you cannot have negative counts. It used to be common to log-transform count data using `log(y+1)` : you have to do `log(y+1)` rather than `log(y)` in case there are any zero counts. Here we will focus on a polynomial example to fit a curve.
 
-## Polynomial linear model: quadratic for simple curves
+## Polynomial linear model: quadratic for simple curves {#sec-curves}
 The word "polynomial" simply indicates that we are going to derive new $x^2$ (x-squared), $x^3$ (x-cubed) etc. terms to put into our linear model in order to fit a curve. Due to problems of biological interpretation, it is very rare to go beyond a simple **quadratic** model:
 
 $$\textit{Response variable}=\textit{Explanatory variable}+\textit{Explanatory variable}^2 + \epsilon$$
@@ -289,19 +306,20 @@ These are easy to create using the `lm()` function using:
 The slightly confusing change to the usual syntax is that `^2` is used to indicate that we are going to add a squared explanatory, and we have to "wrap" the squared term in an extra set of brackets prefaced by `I()` to indicate that we "Intend" to do this, and it isn't a typing error.
 
 ## _Lolium_ growth example
-Let us build on the example at the [Interactive Website on Curve fitting](https://naturalandenvironmentalscience.shinyapps.io/multiple_explan/#section-fitting-curves) for growth of the grass _Lolium perenne_ in soils of different water content. You will need to first:
+Let us build on the example at the [Interactive Website on Curve fitting (right-click and open in new tab)](https://naturalandenvironmentalscience.shinyapps.io/multiple_explan/#section-fitting-curves) for growth of the grass _Lolium perenne_ in soils of different water content. You will need to first:
 
 * dowload the file `grass_growth.csv` from Canvas
 * copy `grass_growth.csv` into your `Data` folder
 * import it into R using `read.csv()` as a table called `lolium_dat`
 
-Use the `head()` function to look at the first few rows, or double-click on `lolium_dat` in the "Environment" pane (top-right of RStudio) to view the whole table of data. Next, produce a scatterplot of the data:
+Use the `head()` function to look at the first few rows, or double-click on `lolium_dat` in the "Environment" pane (top-right of RStudio) to view the whole table of data. Next, produce a scatterplot of the data with the following code. Remember to add blank lines to break up "paragraphs" of code to make it readable:
 
 ```{r, echo=FALSE}
 lolium_dat <- read.csv("Data/grass_growth.csv")
 ```
 
 ```{r, echo=TRUE}
+# Create a scatterplot of Lolium growth data ####
 gf_point(growth ~ water, data=lolium_dat) %>% 
   gf_labs(x = "Soil water content (%)", y="Growth rate") %>% 
   gf_theme(theme_classic())
@@ -322,7 +340,7 @@ summary(lolium_lm1)
 So that was easy! You have a highly significant linear model, showing that _Lolium_ growth increases with water content. The overall model is significant with $F_{1,17}=11.45, p=0.004$, and the $R^2=0.367$ (model explains 36.7% of variation). But... we should always check model assumptions by looking at the residuals to see if there are any abnormalities.
 
 ### Diagnostics for simple (straight line) linear model
-We can actually produce 4 "diagnostic" plots quite easily with the `plot()` function, writing `plot(lolium_lm1)`. Only the first two are really useful here. The `plot()` function extracts the residuals and creates a QQ plot automatically. All the plots look at "Residuals". Remember residuals are the differences between your fitted straight line and the observed points.
+We can actually produce 4 "diagnostic" plots quite easily with the `plot()` function, writing `plot(lolium_lm1)`. Only the first two are really useful here. The `plot()` function extracts the residuals and creates a QQ plot automatically. All the plots look at "Residuals". Remember residuals are the differences between your fitted straight line and the observed points. Remember to hit the "Enter" key in the Console window (bottom left of RStudio) to view both diagnostic plots:
 
 ```{r, echo=TRUE, eval=TRUE}
 plot(lolium_lm1, which=1:2) # We only want the first two diagnostic plots
@@ -335,6 +353,7 @@ plot(lolium_lm1, which=1:2) # We only want the first two diagnostic plots
 If you modify your plot, by adding a line via the `gf_lm()` function, the problem is obvious:
 
 ```{r, echo=TRUE}
+# Lolium scatterplot with badly fitted straight line
 gf_point(growth ~ water, data=lolium_dat) %>% 
   gf_labs(x = "Soil water content (%)", y="Growth rate") %>% 
   gf_lm() %>% 
@@ -388,6 +407,7 @@ plot(lolium_lm2, which=1:2)
 Finally, let's plot the raw data, plus our quadratic model with confidence intervals. By default, the `gf_lm()` function adds a straight line, but if we give it the same quadratic we used in the model, it will add a curve.
 
 ```{r}
+# Lolium scatterplot with quadratic curve plus 95% confidence intervals
 gf_point(growth ~ water, data = lolium_dat) %>% 
   gf_lm(formula = y ~ x + I(x^2), interval = "confidence")
 ```
@@ -406,7 +426,7 @@ If you have any questions about these four topics, pop them into Microsoft Teams
 
 
 # How to improve your experimental design (in your own time)
-Good experimental design will improve your ability to detect treatment effects. Recall from [Interactive Website on Blocking](https://naturalandenvironmentalscience.shinyapps.io/expt_design/) that we use block designs to increase our ability to detect a treatment effect. In the linear models we have looked at so far, there has only been one explanatory variable, so we can think of it as:
+Good experimental design will improve your ability to detect treatment effects. Recall from [Interactive Website on Blocking (right-click and open in new tab)](https://naturalandenvironmentalscience.shinyapps.io/expt_design/) that we use block designs to increase our ability to detect a treatment effect. In the linear models we have looked at so far, there has only been one explanatory variable, so we can think of it as:
 
 $$Response = Explanatory + \epsilon$$
 where:
@@ -438,7 +458,7 @@ This is going to make it hard to separate the signal from the noise. The unexpla
 
 ![](images/large_error.png)
 
-## Randomised block design
+## Randomised block design {#sec-blocks}
 There might be natural variation in your "experimental arena" whether it is a laboratory, glasshouse or field experiment. A fully randomised design is vulnerable to this variation biasing your results. To solve the problem we divide the experimental arena into blocks, and randomly allocate our replicate treatments within each block:
 
 * Divide your laboratory tray into 4 strips with marker pen, arranged so that when you put the tray into the incubator one strip is near the door, the 4th strip near the back of the incubator. Have 4 Petri dishes in each strip, and randomly allocate one of your 4 antibiotics to each of the four Petri dishes.
@@ -507,7 +527,11 @@ That is much better. We no longer have silly statistics for the `Block` column, 
 ### Linear models of pea dataset with and without `Block`
 We'll begin with a simple linear model that ignores the `Block` variable, just to demonstrate the improvement afterwards. This is a one-way ANOVA, as there is only one explanatory categorical variable. It is equivalent to analysing your data as a fully-randomised design.
 
-```{r}
+```{r, eval=FALSE}
+pea_dat_lm1 <- lm(Yield ~ Treatment, data=peas_dat)
+anova(pea_dat_lm1)
+```
+```{r, echo=FALSE}
 pea_dat_lm1 <- lm(Yield ~ Treatment, data=peas_dat)
 print(anova(pea_dat_lm1))
 ```
@@ -516,7 +540,10 @@ What do you conclude from this? Do the fertilisers have a significant effect? Ho
 
 Now repeat but include `Block`. Notice that we are naming our second set of results `pea_dat_lm2`. This is a common convention in R, to end the name of the output with the name of the analysis (here `lm`) and if doing several models to add a suffix `1`, `2` etc. for clarity:
 
-
+```{r, eval=FALSE}
+pea_dat_lm2 <- lm(Yield ~ Treatment + Block, data=peas_dat)
+anova(pea_dat_lm2)
+```
 ```{r, echo=FALSE}
 pea_dat_lm2 <- lm(Yield ~ Treatment + Block, data=peas_dat)
 print(anova(pea_dat_lm2))
@@ -524,7 +551,7 @@ print(anova(pea_dat_lm2))
  
 Notice how the `Treatment` for your fertilisers is now significant. There are several points to notice here:
 
-* The total Sums of Square (a measure of total variation in your dataset) in the data is unchanged in both `lm1` and `lm2` of your pea yield. See [This Interactive Website](https://naturalandenvironmentalscience.shinyapps.io/how_anova_works/#section-variances-with-categorical-explanatory-variables) to remind yourself of the different components of SS
+* The total Sums of Square (a measure of total variation in your dataset) in the data is unchanged in both `lm1` and `lm2` of your pea yield. See [This Interactive Website (right-click and open in new tab)](https://naturalandenvironmentalscience.shinyapps.io/how_anova_works/#section-variances-with-categorical-explanatory-variables) to remind yourself of the different components of SS
 * The **Residuals** are **much smaller** in `pea_dat_lm2`. Residuals are unexplained noise, or the $\epsilon$ in your data. The smaller you can make the noise, the more likely you are to detect a treatment effect.
 * The SS is the same for your `Treatment` in both `pea_dat_lm` and `pea_dat_lm2`
 * Variance explained by each term is measured in the column headed `Mean Sq` by dividing the `Sum sq` by `Df` (degrees of freedom)
