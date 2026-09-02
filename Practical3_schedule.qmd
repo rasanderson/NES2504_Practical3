@@ -106,7 +106,7 @@ Let's look at the example from the [Interactive Website on interaction terms](ht
 
 ## Example of interactions: blood plasma calcium in rabbits
 ### Before you begin
-1. Start RStudio in the usual way. Open your `NES2303` project from the main menu by clicking on **File -> Open project...** and navigate to your NES2303 project file and open it. Check that the word "None" has been replaced by "NES2303" in the project listing at the top right.
+1. Start RStudio in the usual way. Open your `NES2504` project from the main menu by clicking on **File -> Open project...** and navigate to your NES2504 project file and open it. Check that the word "None" has been replaced by "NES2504" in the project listing at the top right.
 2. From the main menu click "File -> New file -> R Script"
 3. Save your script, e.g. call it `practical3.R`
 4. Write a comment line, beginning with a `#` symbol, followed by a blank line e.g.
@@ -119,7 +119,7 @@ Let's look at the example from the [Interactive Website on interaction terms](ht
 Let's look at the example of the blood Ca level in rabbits, half from a lowland agricultural farm, half from an upland farm, split according to gender. So we have two categorical explanatory variables in this example.
 
 1. Download the file `plasma.csv` from Canvas
-2. Using the File Explorer (main Windows menu) copy the `plasma.csv` file from `Downloads` and paste into your `NES2303` project folder.
+2. Using the File Explorer (main Windows menu) copy the `plasma.csv` file from `Downloads` and paste into your `NES2504` project folder.
 3. Edit your `practical3.R` script to import the file into an R table called `plasma_dat` using the `read.csv` function.
 
 Now see if you can produce a boxplot similar to the following. **Hints**:
@@ -262,7 +262,7 @@ How can a linear model fit a curve? The term "linear model" simply refers to the
 
 `calcium_lm <- lm(calcium ~ site + sex + site:sex, data=plasma_dat)`
 
-from earlier has two `+` symbols on the right-hand side. By adjusting some terms in the explanatories you can fit curves (see below). In NES2303 we will only use linear and generalised linear models. We will not use non-linear models.
+from earlier has two `+` symbols on the right-hand side. By adjusting some terms in the explanatories you can fit curves (see below). In NES2504 we will only use linear and generalised linear models. We will not use non-linear models.
 
 ## Data transformation or polynomials?
 It is much easier to fit a straight line than a curve, but often an initial exploration of your data by plotting it will reveal that a straight-line does not provide a satisfactory model. The two main approaches to resolve this are to:
