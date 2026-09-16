@@ -274,6 +274,57 @@ order in which you enter the explanatory variables into the model. The problem
 also arises with unbalanced data if a replicate is accidentally damaged. See
 the interactive website [multiple explanatories (right-click and open in a new tab)](https://naturalandenvironmentalscience.shinyapps.io/multiple_explan/#section-aggh-lost-data) for more examples.
 
+## Regression equations with continuous and categorical explanatories
+Look again at the plot you created earlier: you have two straight line regression lines for areas NW and SE. Thus, there are two regression lines in the scatterplot:
+
+$$
+d13c_{NW} = intercept_{NW} + gradient_{NW} \times length_{NW} + \epsilon
+$$
+and
+$$
+d13c_{SE} = intercept_{SE} + gradient_{SE} \times length_{SE} + \epsilon
+$$
+
+Remember: the **intercept** is the value of `d13c` if your fish length is zero (not that you'll ever get a fish that tiny!!). The **gradient** is simply the change in `d13c` with each unit change of fish length. What are the values for the intercepts and gradients (slopes) in these two equations. First, what would you do if your interaction term had been significant (although we now know it isn't) which would arise if the gradients (slopes) were very different?  You can calculate them from running `summary(anr_lm)` which was your original model:
+
+```{r echo = FALSE}
+summary(anr_lm)
+```
+
+The values you are interested in are displayed under the `Estimate` column. These can be confusing to read if they are in "exponential form" with the letter `e` to indicate numbers of zeroes in the value. You may find it easier to just display the regression coefficients, in the `Estimates` column via the `coefficients()` function, but rounded to 4 significant figures:
+
+```{r}
+coef_lm <- round(coefficients(anr_lm), 4)
+coef_lm
+```
+
+You can now easily construct the two regression equations, using `[]` notation to access the individual components in `coef_lm`. Site NW is treated as the "baseline", simply because "N" comes before the "S" of SE in the alphabet. You now have enough information to calculate the regression lines.
+
+### Area NW
+This is the simplest one, as the values can be read directly from the set of coefficients.
+
+Intercept = `(Intercept)` = `coef_lm[1]` = `r coef_lm[1]`
+
+Gradient = `standard_length` = `coef_lm[2]` = `r coef_lm[2]`
+
+$$
+d13c_{NW} = `r coef_lm[1]` + `r coef_lm[2]` \times length_{NW} + \epsilon
+$$
+
+### Area SE
+This is trickier. The `areaSE` coefficient shows the difference between the intercept of the SE site vs the NW site. Here it is a positive number, so when the `standard_length` is zero, site SE has a higher `d13c` which you can see easily on your graph. The interaction term `standard_length:areaSE` is the difference in the gradient of the line for area SE and area NW. This is tiny, and indeed looking at your plot you can see the two lines appear parallel, and you already know that there is no significant difference in the gradients. Nevertheless, sometimes you will have a real difference in gradients, with a significant interaction, so it is useful to know how to calculate the second regression line.
+
+
+Intercept = `(Intercept) + standard_length` = `coef_lm[1] + coef_lm[3]` = `r coef_lm[1] + coef_lm[3]`
+
+Gradient = `standard_length + standard_length:areaSE` = `coef_lm[2] + coef_lm[4]` = `r coef_lm[2] + coef_lm[4]`
+
+$$
+d13c_{SE} = `r coef_lm[1] + coef_lm[3]` + `r coef_lm[2] + coef_lm[4]` \times length_{SE} + \epsilon
+$$
+
+In reality, you have already found that your second model, `anr_lm2`, which does not have an interaction term, is the better one to use for these data as the slopes of the lines are parallel. Therefore you should use `summary(anr_lm2)` if you want to obtain the correct equations for the two lines. They will have different intercepts, but the same gradient. See if you can work them out yourself.
+
 # Using linear models to fit curves
 How can a linear model fit a curve? The term "linear model" simply refers to the way in which the different explanatory variables are combined. They are all combined using simple addition symbols `+`, for example, your model:
 
